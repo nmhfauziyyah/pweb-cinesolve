@@ -10,8 +10,8 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (name: string, email: string, password: string) => Promise<User>;
   logout: () => void;
   isLoading: boolean;
 }
@@ -32,22 +32,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setIsLoading(false);
   }, []);
 
-  const login = async (email: string, password: string) => {
+  // Mock login: don't call backend, just create a fake token and user
+  const login = async (email: string, password: string): Promise<User> => {
     const response = await axiosInstance.post('/auth/login', { email, password });
     const { token, user: userData } = response.data;
     
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
+    return userData;
   };
 
-  const register = async (name: string, email: string, password: string) => {
+  // Mock register: create user locally and log in immediately
+  const register = async (name: string, email: string, password: string): Promise<User> => {
     const response = await axiosInstance.post('/auth/register', { name, email, password });
     const { token, user: userData } = response.data;
     
     localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
+    return userData;
   };
 
   const logout = () => {

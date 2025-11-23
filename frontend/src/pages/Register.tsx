@@ -8,31 +8,43 @@ import { Film, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import DarkModeToggle from '@/components/DarkModeToggle';
 
-const Login = () => {
+const Register = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { register } = useAuth();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
+    confirmPassword: '',
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: 'Passwords do not match',
+        description: 'Please make sure both passwords are the same.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await login(formData.email, formData.password);
+      await register(formData.name, formData.email, formData.password);
       toast({
-        title: 'Welcome back!',
-        description: 'Successfully logged in.',
+        title: 'Account created!',
+        description: 'Please login with your credentials.',
       });
-      navigate('/home');
+      navigate('/login');
     } catch (error: any) {
       toast({
-        title: 'Login failed',
-        description: error.response?.data?.message || 'Invalid credentials',
+        title: 'Registration failed',
+        description: error.response?.data?.message || 'Something went wrong',
         variant: 'destructive',
       });
     } finally {
@@ -56,11 +68,24 @@ const Login = () => {
                 <Film className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h1 className="font-display text-3xl font-bold">Welcome Back</h1>
-            <p className="text-muted-foreground">Sign in to continue your journey</p>
+            <h1 className="font-display text-3xl font-bold">Join CineSolve</h1>
+            <p className="text-muted-foreground">Create your account to get started</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="John Doe"
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                required
+                className="rounded-xl"
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -87,6 +112,19 @@ const Login = () => {
               />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Input
+                id="confirmPassword"
+                type="password"
+                placeholder="••••••••"
+                value={formData.confirmPassword}
+                onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                required
+                className="rounded-xl"
+              />
+            </div>
+
             <Button
               type="submit"
               className="w-full rounded-xl text-lg font-semibold"
@@ -95,18 +133,18 @@ const Login = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Signing in...
+                  Creating account...
                 </>
               ) : (
-                'Sign In'
+                'Create Account'
               )}
             </Button>
           </form>
 
           <p className="text-center text-sm text-muted-foreground">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-primary hover:underline font-semibold">
-              Sign up
+            Already have an account?{' '}
+            <Link to="/login" className="text-primary hover:underline font-semibold">
+              Sign in
             </Link>
           </p>
         </div>
@@ -118,4 +156,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Register;

@@ -10,7 +10,10 @@ const WatchSourceSchema = new Schema({
 const FilmSchema = new Schema({
   title: { type: String, required: true },
   description: String,
-  poster: String,
+  posterType: { type: String, enum: ['upload', 'url'], default: 'upload' },
+  posterUpload: String, // Path ke file yang di-upload: /uploads/posters/filename.jpg
+  posterUrl: String, // External image URL
+  poster: String, // Deprecated - diisi otomatis dari posterUpload atau posterUrl
   genre: [String],
   country: String,
   moodTags: [String],

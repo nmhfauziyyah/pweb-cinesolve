@@ -1,77 +1,158 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 # pweb-cinesolve
 =======
 # Welcome to your Lovable project
+=======
+### Ni'mah Fauziyyah, NRP 5027241103, Kelas C
+>>>>>>> c89b4b4 (draft1)
 
-## Project info
+# 🎬 CineSolve — Final Project Concept
 
-**URL**: https://lovable.dev/projects/b894e523-bff5-4af1-b9b8-59ad0c236a64
+CineSolve adalah aplikasi rekomendasi film dan drama yang ditujukan untuk mahasiswa, khususnya yang sering bingung dalam mencari tontonan relevan. Aplikasi ini dilengkapi dengan fitur review, bookmark, dan rekomendasi personal untuk memudahkan pengguna dalam memilih tontonan sesuai dengan preferensi mereka.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🧩 1. Problem Statement
 
-**Use Lovable**
+Mahasiswa, terutama perantau, sering menghadapi masalah berikut:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/b894e523-bff5-4af1-b9b8-59ad0c236a64) and start prompting.
+- Bingung memilih film atau drama karena terlalu banyak pilihan
+- Sulit menemukan rekomendasi yang sesuai dengan mood, negara, atau genre
+- Lupa film yang ingin ditonton
+- Tidak punya tempat untuk menyimpan film favorit
+- Review film tidak terpusat
 
-Changes made via Lovable will be committed automatically to this repo.
+CineSolve hadir untuk menyederhanakan proses memilih tontonan dan memberikan tempat untuk menyimpan daftar film favorit secara digital.
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 2. Solution Overview
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+CineSolve menyediakan platform dengan fitur-fitur berikut:
 
-Follow these steps:
+- **List film rekomendasi** berdasarkan genre & negara
+- **Detail film lengkap** dengan informasi lengkap tentang film
+- **Review dari user lain** dan rating film
+- **Bookmark list** untuk menyimpan film favorit
+- **Upload poster (admin)** untuk menambahkan poster film
+- **Tambah film lewat URL poster (opsional)**
+- **Dark mode** untuk kenyamanan mata mahasiswa
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
+---
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 🧱 3. Tech Stack
 
-# Step 3: Install the necessary dependencies.
-npm i
+**Frontend**:
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+- React.js
+- React Router
+- Axios
+- TailwindCSS
+- Context/Redux (opsional)
+- LocalStorage (akses token + mode gelap)
 
-**Edit a file directly in GitHub**
+**Backend**:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+- Node.js + Express
+- MongoDB Local
+- Mongoose
+- Multer (untuk upload file)
+- JWT Authentication
+- Bcrypt (untuk hashing password)
 
-**Use GitHub Codespaces**
+---
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🗂️ 4. Frontend — Final Pages
 
-## What technologies are used for this project?
+1. **Login & Register Page**
 
-This project is built with:
+   - JWT Authentication
+   - Simpan token ke LocalStorage
+   - Redirect sesuai role pengguna (User / Admin)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+2. **Dashboard**
 
-## How can I deploy this project?
+   - **User Dashboard**:
+     - Rekomendasi film berdasarkan genre & negara
+     - Search film
+     - Filter berdasarkan negara
+     - Dark mode toggle
+   - **Admin Dashboard**:
+     - Daftar film yang tersedia
+     - Tombol tambah/edit/hapus film
 
-Simply open [Lovable](https://lovable.dev/projects/b894e523-bff5-4af1-b9b8-59ad0c236a64) and click on Share -> Publish.
+3. **Film Detail Page**
 
-## Can I connect a custom domain to my Lovable project?
+   - Poster film (upload atau URL)
+   - Genre, negara, tahun
+   - Deskripsi film
+   - Rating rata-rata
+   - Daftar review pengguna
+   - Form untuk menambah review
 
-Yes, you can!
+4. **Bookmark Page (User)**
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+   - Daftar film yang telah disimpan
+   - Quick remove bookmark
+   - Klik untuk menuju halaman detail film
 
+<<<<<<< HEAD
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
 >>>>>>> 5915865 (Initial commit from template vite_react_shadcn_ts_20250728_minor)
+=======
+5. **Admin: Add/Edit Film**
+   - Form untuk menambah/edit film yang berisi:
+     - Title
+     - Genre
+     - Country
+     - Year
+     - Description
+     - Upload poster (file)
+     - Poster via URL (opsional)
+     - Preview poster muncul otomatis
+
+---
+
+## 🛠️ Setup Instructions
+
+### 1. Setup Frontend
+
+1. Masuk ke direktori frontend:
+
+   ```bash
+   cd frontend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Jalankan aplikasi frontend:
+   ```bash
+   npm run dev
+   ```
+
+### 2. Setup Backend
+
+1. Masuk ke direktori backend:
+
+   ```bash
+   cd backend
+   ```
+
+2. Install dependencies:
+
+   ```bash
+   npm install
+   ```
+
+3. Jalankan aplikasi backend:
+   ```bash
+   npm run dev
+   ```
+
+---
+>>>>>>> c89b4b4 (draft1)
