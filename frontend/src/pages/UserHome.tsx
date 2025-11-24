@@ -3,7 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Film, Search, LogOut, User, TrendingUp, Heart, Zap, Smile, AlertTriangle } from 'lucide-react';
+import { Film, Search, LogOut, User, TrendingUp, Heart, Zap, Smile, AlertTriangle, ChevronLeft, ChevronRight, Bookmark } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import MovieCard from '@/components/MovieCard';
 import DarkModeToggle from '@/components/DarkModeToggle';
@@ -41,6 +41,7 @@ const UserHome = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [filteredMovies, setFilteredMovies] = useState([]);
+  const [carouselPosition, setCarouselPosition] = useState(0);
 
   // Mood to genres mapping
   const moods: Mood[] = [
@@ -163,18 +164,33 @@ const UserHome = () => {
     navigate('/');
   };
 
+  const handleLogoClick = () => {
+    setSearchQuery('');
+    setSelectedCountry('all');
+    setSelectedGenre('all');
+    setSelectedMood(null);
+  };
+
   return (
     <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-50 glass-card border-b">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-2">
+          <button onClick={handleLogoClick} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Film className="h-7 w-7 text-primary" />
             <span className="font-display text-2xl font-bold">CineSolve</span>
-          </div>
+          </button>
           
           <div className="flex items-center gap-4">
             <DarkModeToggle />
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => navigate('/bookmarks')}
+              className="rounded-full"
+            >
+              <Bookmark className="h-5 w-5" />
+            </Button>
             <Button
               variant="ghost"
               size="icon"
@@ -293,15 +309,50 @@ const UserHome = () => {
             <h2 className="font-display text-3xl font-bold">Trending Now</h2>
           </div>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
-            {trendingMovies.length > 0 ? (
-              trendingMovies.map((movie: any) => (
-                <MovieCard key={movie._id} movie={movie} />
-              ))
-            ) : (
-              <p className="col-span-full text-center text-muted-foreground py-8">
-                No trending movies available
-              </p>
+          <div className="relative group">
+            <div className="overflow-hidden">
+              <div 
+                className="flex transition-all duration-500 ease-out"
+                style={{ transform: `translateX(calc(-${carouselPosition * 20}% - ${carouselPosition * 12}px))` }}
+              >
+                {trendingMovies.length > 0 ? (
+                  trendingMovies.map((movie: any, index: number) => (
+                    <div key={movie._id} className="flex-shrink-0 w-1/5 px-3">
+                      <div className="relative">
+                        <MovieCard movie={movie} />
+                        {/* Ranking Number */}
+                        <div className="absolute top-3 left-3 bg-primary text-primary-foreground rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm z-20">
+                          {index + 1}
+                        </div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-center text-muted-foreground py-8 w-full">
+                    No trending movies available
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Left Arrow */}
+            {carouselPosition > 0 && (
+              <button
+                onClick={() => setCarouselPosition(Math.max(0, carouselPosition - 1))}
+                className="absolute -left-6 top-1/2 -translate-y-1/2 z-10 bg-primary rounded-full p-2 hover:bg-primary/90 transition-colors"
+              >
+                <ChevronLeft className="h-6 w-6 text-primary-foreground" />
+              </button>
+            )}
+
+            {/* Right Arrow - only show if can scroll more */}
+            {trendingMovies.length > 5 && carouselPosition < trendingMovies.length - 5 && (
+              <button
+                onClick={() => setCarouselPosition(carouselPosition + 1)}
+                className="absolute -right-6 top-1/2 -translate-y-1/2 z-10 bg-primary rounded-full p-2 hover:bg-primary/90 transition-colors"
+              >
+                <ChevronRight className="h-6 w-6 text-primary-foreground" />
+              </button>
             )}
           </div>
         </section>
@@ -316,7 +367,7 @@ const UserHome = () => {
                 : 'Browse All'}
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
             {filteredMovies.length > 0 ? (
               filteredMovies.map((movie: any) => (
                 <MovieCard key={movie._id} movie={movie} />

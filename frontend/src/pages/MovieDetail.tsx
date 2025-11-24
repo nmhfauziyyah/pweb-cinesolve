@@ -34,7 +34,14 @@ const MovieDetail = () => {
   const fetchReviews = async () => {
     try {
       const response = await axiosInstance.get(`/reviews/movie/${id}`);
-      setReviews(response.data);
+      // Transform reviews to match frontend expectations
+      const transformedReviews = response.data.map((review: any) => ({
+        ...review,
+        id: review._id,
+        userId: review.user_id?._id || review.user_id,
+        userName: review.user_id?.name || 'Anonymous',
+      }));
+      setReviews(transformedReviews);
     } catch (error) {
       console.error('Error fetching reviews:', error);
     }
@@ -43,7 +50,7 @@ const MovieDetail = () => {
   const handleSubmitReview = async () => {
     try {
       await axiosInstance.post('/reviews', {
-        movieId: id,
+        film_id: id,
         rating: newReview.rating,
         description: newReview.description,
       });

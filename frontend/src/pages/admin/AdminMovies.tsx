@@ -17,9 +17,11 @@ const AdminMovies = () => {
   const fetchMovies = async () => {
     try {
       const response = await axiosInstance.get('/movies');
+      console.log('Fetched movies:', response.data);
       setMovies(response.data);
     } catch (error) {
       console.error('Error fetching movies:', error);
+      toast({ title: 'Failed to fetch movies', variant: 'destructive' });
     }
   };
 
@@ -31,6 +33,7 @@ const AdminMovies = () => {
       toast({ title: 'Movie deleted successfully' });
       fetchMovies();
     } catch (error) {
+      console.error('Delete error:', error);
       toast({ title: 'Failed to delete movie', variant: 'destructive' });
     }
   };
@@ -74,32 +77,40 @@ const AdminMovies = () => {
                 </tr>
               </thead>
               <tbody>
-                {movies.map((movie) => (
-                  <tr key={movie.id} className="border-b last:border-0 hover:bg-muted/50">
-                    <td className="p-4 font-semibold">{movie.title}</td>
-                    <td className="p-4">{movie.year}</td>
-                    <td className="p-4">{movie.country}</td>
-                    <td className="p-4">{movie.genres?.join(', ')}</td>
-                    <td className="p-4">
-                      <div className="flex justify-end gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => navigate(`/admin/movies/edit/${movie.id}`)}
-                        >
-                          <Edit className="h-4 w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(movie.id)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
+                {movies.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                      No movies found
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  movies.map((movie) => (
+                    <tr key={movie.id} className="border-b last:border-0 hover:bg-muted/50">
+                      <td className="p-4 font-semibold">{movie.title}</td>
+                      <td className="p-4">{movie.year || 'N/A'}</td>
+                      <td className="p-4">{movie.country || 'N/A'}</td>
+                      <td className="p-4">{movie.genres?.join(', ') || 'N/A'}</td>
+                      <td className="p-4">
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => navigate(`/admin/movies/edit/${movie.id}`)}
+                          >
+                            <Edit className="h-4 w-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => handleDelete(movie.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

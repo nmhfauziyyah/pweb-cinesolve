@@ -7,6 +7,7 @@ const upload = require('../middleware/uploadMiddleware');
 
 router.get('/', filmCtrl.getAllFilms);
 router.get('/trending', filmCtrl.getTrending);
+router.get('/bookmarks/list', verifyToken, attachUserModel, filmCtrl.getBookmarks);
 router.get('/:id', filmCtrl.getFilmById);
 
 router.post('/', verifyToken, adminOnly, upload.single('poster'), filmCtrl.createFilm);
@@ -16,6 +17,5 @@ router.delete('/:id', verifyToken, adminOnly, filmCtrl.deleteFilm);
 // Bookmarks
 router.post('/:id/bookmark', verifyToken, attachUserModel, filmCtrl.addBookmark);
 router.delete('/:id/bookmark', verifyToken, attachUserModel, filmCtrl.removeBookmark);
-router.get('/bookmarks/list', verifyToken, attachUserModel, filmCtrl.getBookmarks);
 
 module.exports = router;

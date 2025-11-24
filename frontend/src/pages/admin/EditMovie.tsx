@@ -30,6 +30,7 @@ const EditMovie = () => {
   const [genres, setGenres] = useState<Genre[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
+  const [posterSource, setPosterSource] = useState<'upload' | 'url'>('upload');
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -67,23 +68,33 @@ const EditMovie = () => {
     try {
       const response = await axiosInstance.get(`/movies/${id}`);
       const movie = response.data;
+      
+      // Determine poster source from response
+      const source = movie.posterUpload ? 'upload' : 'url';
+      setPosterSource(source);
+      
       setFormData({
         title: movie.title,
         description: movie.description,
         poster: null,
         posterUrl: movie.poster,
         country: movie.country || '',
-        releaseYear: movie.releaseYear?.toString() || '',
+        releaseYear: movie.year?.toString() || '',
       });
-      // Find genre IDs by name
-      const genreIds = movie.genre?.map((genreName: string) => {
-        const foundGenre = genres.find(g => g.name === genreName);
-        return foundGenre?._id;
-      }).filter(Boolean) || [];
-      setSelectedGenres(genreIds);
+      
+      // Find genre IDs by name - wait for genres to be loaded
+      setTimeout(() => {
+        const genreIds = movie.genres?.map((genreName: string) => {
+          const foundGenre = genres.find(g => g.name === genreName);
+          return foundGenre?._id;
+        }).filter(Boolean) || [];
+        setSelectedGenres(genreIds);
+      }, 100);
+      
       setPreviewUrl(movie.poster);
       setIsLoading(false);
     } catch (error) {
+      console.error('Error fetching movie:', error);
       toast({ title: 'Failed to fetch movie', variant: 'destructive' });
       setIsLoading(false);
     }
@@ -113,6 +124,16 @@ const EditMovie = () => {
       toast({ title: 'Please select at least one genre', variant: 'destructive' });
       return;
     }
+    
+    if (posterSource === 'upload' && !formData.poster && !previewUrl) {
+      toast({ title: 'Please upload or select a poster image', variant: 'destructive' });
+      return;
+    }
+    
+    if (posterSource === 'url' && !formData.posterUrl && !previewUrl) {
+      toast({ title: 'Please enter a poster URL', variant: 'destructive' });
+      return;
+    }
 
     setIsLoading(true);
 
@@ -120,14 +141,21 @@ const EditMovie = () => {
       const data = new FormData();
       data.append('title', formData.title);
       data.append('description', formData.description);
-      data.append('genre', JSON.stringify(selectedGenres.map(id => genres.find(g => g._id === id)?.name).filter(Boolean)));
+      
+      // Append each genre separately for proper array parsing
+      const genreNames = selectedGenres.map(id => genres.find(g => g._id === id)?.name).filter(Boolean);
+      genreNames.forEach(genre => {
+        data.append('genre', genre);
+      });
+      
       data.append('country', formData.country);
       data.append('releaseYear', formData.releaseYear);
       data.append('moodTags', JSON.stringify([]));
-      data.append('watchSources', JSON.stringify([]));
       
-      if (formData.poster) {
+      if (posterSource === 'upload' && formData.poster) {
         data.append('poster', formData.poster);
+      } else if (posterSource === 'url' && formData.posterUrl) {
+        data.append('posterUrl', formData.posterUrl);
       }
 
       await axiosInstance.put(`/movies/${id}`, data, {
@@ -194,29 +222,81 @@ const EditMovie = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="poster">Movie Poster (Upload to Change)</Label>
-              <div className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary transition">
-                <input
-                  id="poster"
-                  type="file"
-                  accept="image/*"
-                  onChange={handleFileChange}
-                  className="hidden"
-                />
-                <label htmlFor="poster" className="cursor-pointer">
-                  {previewUrl ? (
-                    <div className="space-y-2">
-                      <img src={previewUrl} alt="Preview" className="h-32 w-32 object-cover rounded-lg mx-auto" />
-                      <p className="text-sm text-muted-foreground">Click to change image</p>
-                    </div>
-                  ) : (
-                    <div className="space-y-2">
-                      <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
-                      <p className="font-semibold">Click to upload or drag and drop</p>
-                      <p className="text-sm text-muted-foreground">PNG, JPG, WebP up to 10MB</p>
-                    </div>
-                  )}
-                </label>
+              <Label htmlFor="poster">Movie Poster</Label>
+              <div className="space-y-3">
+                <div className="flex gap-4 p-3 border border-input rounded-xl bg-background">
+                  <label className="flex items-center gap-2 cursor-pointer flex-1">
+                    <input
+                      type="radio"
+                      name="posterSource"
+                      value="upload"
+                      checked={posterSource === 'upload'}
+                      onChange={(e) => {
+                        setPosterSource(e.target.value as 'upload' | 'url');
+                      }}
+                      className="cursor-pointer"
+                    />
+                    <span className="text-sm font-medium">Upload Image</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer flex-1">
+                    <input
+                      type="radio"
+                      name="posterSource"
+                      value="url"
+                      checked={posterSource === 'url'}
+                      onChange={(e) => {
+                        setPosterSource(e.target.value as 'upload' | 'url');
+                        setFormData({ ...formData, poster: null });
+                      }}
+                      className="cursor-pointer"
+                    />
+                    <span className="text-sm font-medium">Image URL</span>
+                  </label>
+                </div>
+
+                {posterSource === 'upload' ? (
+                  <div className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary transition">
+                    <input
+                      id="poster"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="hidden"
+                    />
+                    <label htmlFor="poster" className="cursor-pointer">
+                      {previewUrl ? (
+                        <div className="space-y-2">
+                          <img src={previewUrl} alt="Preview" className="h-32 w-32 object-cover rounded-lg mx-auto" />
+                          <p className="text-sm text-muted-foreground">Click to change image</p>
+                        </div>
+                      ) : (
+                        <div className="space-y-2">
+                          <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                          <p className="font-semibold">Click to upload or drag and drop</p>
+                          <p className="text-sm text-muted-foreground">PNG, JPG, WebP up to 10MB</p>
+                        </div>
+                      )}
+                    </label>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    <Input
+                      type="url"
+                      placeholder="Enter image URL (e.g., https://example.com/poster.jpg)"
+                      value={formData.posterUrl}
+                      onChange={(e) => {
+                        setFormData({ ...formData, posterUrl: e.target.value });
+                        setPreviewUrl(e.target.value);
+                      }}
+                      className="rounded-xl"
+                    />
+                    {previewUrl && (
+                      <div className="border rounded-xl p-3 bg-muted">
+                        <img src={previewUrl} alt="Preview" className="h-32 w-32 object-cover rounded-lg mx-auto" onError={() => setPreviewUrl('')} />
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

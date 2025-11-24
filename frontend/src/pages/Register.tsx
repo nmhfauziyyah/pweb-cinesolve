@@ -23,6 +23,16 @@ const Register = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate password length
+    if (formData.password.length < 8) {
+      toast({
+        title: 'Password too short',
+        description: 'Password must be at least 8 characters long.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     if (formData.password !== formData.confirmPassword) {
       toast({
         title: 'Passwords do not match',
@@ -110,6 +120,9 @@ const Register = () => {
                 required
                 className="rounded-xl"
               />
+              <p className="text-xs text-muted-foreground">
+                {formData.password.length < 8 ? `At least ${8 - formData.password.length} more characters` : '✓ Valid password length'}
+              </p>
             </div>
 
             <div className="space-y-2">

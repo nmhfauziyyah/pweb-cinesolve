@@ -19,8 +19,23 @@ app.use(cors({
   optionsSuccessStatus: 200
 }));
 
-// serve uploads
-app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads')));
+// serve uploads with CORS headers and cache control
+app.use('/uploads', (req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type');
+  // Cache images untuk 30 hari di browser
+  res.header('Cache-Control', 'public, max-age=2592000');
+  next();
+}, express.static(path.join(__dirname, '..', 'uploads'), {
+  // Serve with proper MIME type untuk webp
+  setHeaders: (res, path) => {
+    if (path.endsWith('.webp')) {
+      res.setHeader('Content-Type', 'image/webp');
+    }
+  }
+}));
+
 
 app.use('/api/auth', authRoutes);
 app.use('/api/movies', filmRoutes);

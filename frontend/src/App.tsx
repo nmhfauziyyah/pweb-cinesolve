@@ -11,6 +11,7 @@ import Register from "./pages/Register";
 import UserHome from "./pages/UserHome";
 import MovieDetail from "./pages/MovieDetail";
 import Profile from "./pages/Profile";
+import Bookmarks from "./pages/Bookmarks";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminMovies from "./pages/admin/AdminMovies";
 import AddMovie from "./pages/admin/AddMovie";
@@ -34,6 +35,7 @@ const App = () => (
             <Route path="/home" element={<ProtectedRoute><UserHome /></ProtectedRoute>} />
             <Route path="/movie/:id" element={<ProtectedRoute><MovieDetail /></ProtectedRoute>} />
             <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            <Route path="/bookmarks" element={<ProtectedRoute><Bookmarks /></ProtectedRoute>} />
             
             <Route path="/admin" element={<ProtectedRoute adminOnly><AdminDashboard /></ProtectedRoute>} />
             <Route path="/admin/movies" element={<ProtectedRoute adminOnly><AdminMovies /></ProtectedRoute>} />
