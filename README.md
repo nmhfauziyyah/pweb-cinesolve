@@ -1,11 +1,4 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-# pweb-cinesolve
-=======
-# Welcome to your Lovable project
-=======
 ### Ni'mah Fauziyyah, NRP 5027241103, Kelas C
->>>>>>> c89b4b4 (draft1)
 
 # 🎬 CineSolve — Final Project Concept
 
@@ -97,10 +90,6 @@ CineSolve menyediakan platform dengan fitur-fitur berikut:
    - Quick remove bookmark
    - Klik untuk menuju halaman detail film
 
-<<<<<<< HEAD
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
->>>>>>> 5915865 (Initial commit from template vite_react_shadcn_ts_20250728_minor)
-=======
 5. **Admin: Add/Edit Film**
    - Form untuk menambah/edit film yang berisi:
      - Title
@@ -155,4 +144,3 @@ Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/c
    ```
 
 ---
->>>>>>> c89b4b4 (draft1)
