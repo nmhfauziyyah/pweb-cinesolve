@@ -17,6 +17,27 @@ const MovieDetail = () => {
   const [reviews, setReviews] = useState<any[]>([]);
   const [newReview, setNewReview] = useState({ rating: 5, description: '' });
 
+  // Map platform names to their image paths
+  const platformIconMap: Record<string, string> = {
+    'Netflix': '/netflix.png',
+    'Disney+': '/disney.jpeg',
+    'Prime Video': '/prime.png',
+    'Viu': '/viu.png',
+    'iQiyi': '/iqiyi.png',
+    'Vidio': '/vidio.png',
+    'WeTV': '/wetv.jpg',
+  };
+
+  // Helper function to get proper icon path
+  const getProperIconPath = (platformName: string, platformIcon: string) => {
+    // If platformIcon is already a valid image path (starts with /), use it
+    if (platformIcon && platformIcon.startsWith('/')) {
+      return platformIcon;
+    }
+    // Otherwise, look up by platform name
+    return platformIconMap[platformName] || '/netflix.png';
+  };
+
   useEffect(() => {
     fetchMovieDetails();
     fetchReviews();
@@ -72,6 +93,17 @@ const MovieDetail = () => {
     }
   };
 
+  const BASE_URL = 'http://localhost:3000'; 
+  const getFullPosterUrl = (posterPath: string) => {
+    if (posterPath && (posterPath.startsWith('http://') || posterPath.startsWith('https://'))) {
+      return posterPath;
+    } 
+    if (posterPath) {
+      return `${BASE_URL}/uploads/posters/${posterPath}`;
+    }
+    return '/placeholder.svg'; 
+  };
+
   if (!movie) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -80,66 +112,86 @@ const MovieDetail = () => {
     );
   }
 
+  const heroImageUrl = getFullPosterUrl(movie.poster);
+
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <div className="relative h-[60vh] overflow-hidden">
-        <img
-          src={movie.poster}
-          alt={movie.title}
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent"></div>
-        
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={() => navigate('/home')}
-          className="absolute top-6 left-6 rounded-full bg-black/50 hover:bg-black/70 text-white"
-        >
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-      </div>
+      {/* Simple Header */}
+      <header className="sticky top-0 z-50 glass-card border-b">
+        <div className="container mx-auto px-4 md:px-6 py-4">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/home')}
+            className="rounded-full"
+          >
+            <ArrowLeft className="h-5 w-5" />
+          </Button>
+        </div>
+      </header>
 
-      <main className="container mx-auto px-6 -mt-32 relative z-10 pb-12 space-y-12">
-        {/* Movie Info */}
-        <div className="glass-card p-8 rounded-3xl space-y-6">
-          <div className="space-y-4">
-            <h1 className="font-display text-5xl font-bold">{movie.title}</h1>
-            
-            <div className="flex flex-wrap items-center gap-3">
-              <Badge variant="secondary" className="text-sm px-3 py-1">
-                {movie.year}
-              </Badge>
-              <Badge variant="secondary" className="text-sm px-3 py-1">
-                {movie.country}
-              </Badge>
-              {movie.genres?.map((genre: string) => (
-                <Badge key={genre} variant="outline" className="text-sm px-3 py-1">
-                  {genre}
+      <main className="container mx-auto px-4 md:px-6 py-8 pb-12 space-y-12">
+        {/* Movie Header with Poster Card */}
+        <div className="glass-card p-6 md:p-8 rounded-3xl space-y-6">
+          <div className="flex flex-col md:flex-row gap-6 md:gap-8">
+            {/* Poster Card */}
+            <div className="flex-shrink-0">
+              <div className="w-40 md:w-48 h-60 md:h-72 rounded-2xl overflow-hidden shadow-lg border border-primary/20">
+                <img
+                  src={heroImageUrl}
+                  alt={movie.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Title & Info */}
+            <div className="flex-1 space-y-4">
+              <h1 className="font-display text-3xl md:text-5xl font-bold">{movie.title}</h1>
+              
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge variant="secondary" className="text-sm px-3 py-1">
+                  {movie.year}
                 </Badge>
-              ))}
+                <Badge variant="secondary" className="text-sm px-3 py-1">
+                  {movie.country}
+                </Badge>
+                {movie.genres?.map((genre: string) => (
+                  <Badge key={genre} variant="outline" className="text-sm px-3 py-1">
+                    {genre}
+                  </Badge>
+                ))}
+              </div>
+
+              <p className="text-base md:text-lg text-muted-foreground leading-relaxed">
+                {movie.description}
+              </p>
             </div>
           </div>
 
-          <p className="text-lg text-muted-foreground leading-relaxed">
-            {movie.description}
-          </p>
-
+          {/* Watch Sources */}
           {movie.watchSources && movie.watchSources.length > 0 && (
             <div className="space-y-3">
-              <h3 className="font-display text-xl font-bold">Watch On</h3>
-              <div className="flex gap-4">
+              <h3 className="font-display text-xl font-bold">Where to Watch</h3>
+              <div className="flex flex-wrap gap-3">
                 {movie.watchSources.map((source: any) => (
                   <a
-                    key={source.id}
+                    key={source.platformName}
                     href={source.platformUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="glass-card p-4 rounded-xl hover-lift flex items-center gap-2"
+                    className="glass-card px-4 py-2 rounded-lg hover-lift flex items-center gap-2 transition hover:bg-primary/10"
                   >
-                    <ExternalLink className="h-4 w-4" />
-                    <span>{source.name}</span>
+                    <img 
+                      src={getProperIconPath(source.platformName, source.platformIcon)} 
+                      alt={source.platformName} 
+                      className="h-5 w-5"
+                      onError={(e) => {
+                        // Fallback if image fails to load
+                        e.currentTarget.src = platformIconMap[source.platformName] || '/netflix.png';
+                      }}
+                    />
+                    <span className="font-semibold">{source.platformName}</span>
                   </a>
                 ))}
               </div>
@@ -149,11 +201,11 @@ const MovieDetail = () => {
 
         {/* Reviews Section */}
         <section className="space-y-6">
-          <h2 className="font-display text-3xl font-bold">Reviews</h2>
+          <h2 className="font-display text-2xl md:text-3xl font-bold">Reviews</h2>
 
           {/* Add Review */}
-          <div className="glass-card p-6 rounded-2xl space-y-4">
-            <h3 className="font-semibold text-lg">Write a Review</h3>
+          <div className="glass-card p-4 md:p-6 rounded-2xl space-y-4">
+            <h3 className="font-semibold text-base md:text-lg">Write a Review</h3>
             
             <div className="flex gap-2">
               {[1, 2, 3, 4, 5].map((star) => (

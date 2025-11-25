@@ -29,6 +29,10 @@ const Bookmarks = () => {
     }
   };
 
+  const handleRemoveBookmark = (movieId: string) => {
+    setBookmarkedMovies(bookmarkedMovies.filter((movie: any) => movie._id !== movieId));
+  };
+
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -42,10 +46,10 @@ const Bookmarks = () => {
     <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-50 glass-card border-b">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
           <button onClick={handleLogoClick} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Film className="h-7 w-7 text-primary" />
-            <span className="font-display text-2xl font-bold">CineSolve</span>
+            <span className="font-display text-xl md:text-2xl font-bold hidden sm:inline">CineSolve</span>
           </button>
           
           <div className="flex items-center gap-4">
@@ -70,7 +74,7 @@ const Bookmarks = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8 space-y-8">
+      <main className="container mx-auto px-4 md:px-6 py-8 space-y-8">
         {/* Back & Title */}
         <div className="flex items-center gap-4">
           <Button
@@ -83,7 +87,7 @@ const Bookmarks = () => {
           </Button>
           <div className="flex items-center gap-2">
             <Bookmark className="h-6 w-6 text-primary fill-primary" />
-            <h1 className="font-display text-4xl font-bold">My Bookmarks</h1>
+            <h1 className="font-display text-3xl md:text-4xl font-bold">My Bookmarks</h1>
           </div>
         </div>
 
@@ -98,16 +102,21 @@ const Bookmarks = () => {
               <p className="text-muted-foreground">
                 {bookmarkedMovies.length} movie{bookmarkedMovies.length !== 1 ? 's' : ''} bookmarked
               </p>
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
                 {bookmarkedMovies.map((movie: any) => (
-                  <MovieCard key={movie._id} movie={movie} />
+                  <MovieCard 
+                    key={movie._id} 
+                    movie={movie} 
+                    isBookmarkPage={true}
+                    onRemoveBookmark={handleRemoveBookmark}
+                  />
                 ))}
               </div>
             </>
           ) : (
-            <div className="glass-card p-12 rounded-2xl text-center space-y-4">
+            <div className="glass-card p-8 md:p-12 rounded-2xl text-center space-y-4">
               <Bookmark className="h-16 w-16 text-muted-foreground mx-auto opacity-50" />
-              <p className="text-xl text-muted-foreground">No bookmarks yet</p>
+              <p className="text-lg md:text-xl text-muted-foreground">No bookmarks yet</p>
               <p className="text-sm text-muted-foreground">
                 Start bookmarking movies to save them for later!
               </p>

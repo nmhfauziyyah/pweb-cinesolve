@@ -63,7 +63,7 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 relative overflow-hidden">
       <div className="absolute inset-0 premium-gradient opacity-20"></div>
       
       <div className="absolute top-6 right-6 z-10">
@@ -71,20 +71,20 @@ const Register = () => {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        <div className="glass-card p-8 rounded-3xl space-y-8">
+        <div className="glass-card p-6 md:p-8 rounded-3xl space-y-8">
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-4">
               <div className="p-3 rounded-2xl bg-primary/10">
                 <Film className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h1 className="font-display text-3xl font-bold">Join CineSolve</h1>
-            <p className="text-muted-foreground">Create your account to get started</p>
+            <h1 className="font-display text-2xl md:text-3xl font-bold">Join CineSolve</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Create your account to get started</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5 md:space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+              <Label htmlFor="name" className="text-sm">Full Name</Label>
               <Input
                 id="name"
                 type="text"
@@ -92,12 +92,12 @@ const Register = () => {
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                 required
-                className="rounded-xl"
+                className="rounded-xl text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-sm">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -105,12 +105,12 @@ const Register = () => {
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                 required
-                className="rounded-xl"
+                className="rounded-xl text-sm"
               />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-sm">Password</Label>
               <Input
                 id="password"
                 type="password"
@@ -118,7 +118,7 @@ const Register = () => {
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 required
-                className="rounded-xl"
+                className="rounded-xl text-sm"
               />
               <p className="text-xs text-muted-foreground">
                 {formData.password.length < 8 ? `At least ${8 - formData.password.length} more characters` : '✓ Valid password length'}

@@ -24,15 +24,21 @@ app.use('/uploads', (req, res, next) => {
   res.header('Access-Control-Allow-Origin', '*');
   res.header('Access-Control-Allow-Methods', 'GET, HEAD, OPTIONS');
   res.header('Access-Control-Allow-Headers', 'Content-Type');
-  // Cache images untuk 30 hari di browser
-  res.header('Cache-Control', 'public, max-age=2592000');
+  res.header('Cache-Control', 'public, max-age=604800, must-revalidate');
+  res.header('ETag', 'W/"' + Date.now() + '"');
   next();
 }, express.static(path.join(__dirname, '..', 'uploads'), {
-  // Serve with proper MIME type untuk webp
-  setHeaders: (res, path) => {
-    if (path.endsWith('.webp')) {
+  maxAge: '7d',
+  setHeaders: (res, filePath) => {
+    // Set proper MIME type untuk berbagai format
+    if (filePath.endsWith('.webp')) {
       res.setHeader('Content-Type', 'image/webp');
+    } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (filePath.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png');
     }
+    res.setHeader('Cache-Control', 'public, max-age=604800');
   }
 }));
 

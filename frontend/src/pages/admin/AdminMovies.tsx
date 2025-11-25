@@ -41,7 +41,7 @@ const AdminMovies = () => {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-50 glass-card border-b">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
           <Button
             variant="ghost"
             size="icon"
@@ -61,19 +61,19 @@ const AdminMovies = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-12 space-y-8">
-        <h1 className="font-display text-4xl font-bold">Manage Movies</h1>
+      <main className="container mx-auto px-4 md:px-6 py-12 space-y-8">
+        <h1 className="font-display text-3xl md:text-4xl font-bold">Manage Movies</h1>
 
         <div className="glass-card rounded-3xl overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full">
+            <table className="w-full text-sm md:text-base">
               <thead className="border-b">
                 <tr>
-                  <th className="text-left p-4 font-semibold">Title</th>
-                  <th className="text-left p-4 font-semibold">Year</th>
-                  <th className="text-left p-4 font-semibold">Country</th>
-                  <th className="text-left p-4 font-semibold">Genre</th>
-                  <th className="text-right p-4 font-semibold">Actions</th>
+                  <th className="text-left p-3 md:p-4 font-semibold">Title</th>
+                  <th className="text-left p-3 md:p-4 font-semibold hidden sm:table-cell">Year</th>
+                  <th className="text-left p-3 md:p-4 font-semibold hidden md:table-cell">Country</th>
+                  <th className="text-left p-3 md:p-4 font-semibold hidden lg:table-cell">Genre</th>
+                  <th className="text-right p-3 md:p-4 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -86,15 +86,16 @@ const AdminMovies = () => {
                 ) : (
                   movies.map((movie) => (
                     <tr key={movie.id} className="border-b last:border-0 hover:bg-muted/50">
-                      <td className="p-4 font-semibold">{movie.title}</td>
-                      <td className="p-4">{movie.year || 'N/A'}</td>
-                      <td className="p-4">{movie.country || 'N/A'}</td>
-                      <td className="p-4">{movie.genres?.join(', ') || 'N/A'}</td>
-                      <td className="p-4">
+                      <td className="p-3 md:p-4 font-semibold line-clamp-1">{movie.title}</td>
+                      <td className="p-3 md:p-4 hidden sm:table-cell">{movie.year || 'N/A'}</td>
+                      <td className="p-3 md:p-4 hidden md:table-cell">{movie.country || 'N/A'}</td>
+                      <td className="p-3 md:p-4 hidden lg:table-cell">{movie.genres?.join(', ') || 'N/A'}</td>
+                      <td className="p-3 md:p-4">
                         <div className="flex justify-end gap-2">
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="h-8 w-8 md:h-10 md:w-10"
                             onClick={() => navigate(`/admin/movies/edit/${movie.id}`)}
                           >
                             <Edit className="h-4 w-4" />
@@ -102,6 +103,7 @@ const AdminMovies = () => {
                           <Button
                             variant="ghost"
                             size="icon"
+                            className="h-8 w-8 md:h-10 md:w-10"
                             onClick={() => handleDelete(movie.id)}
                           >
                             <Trash2 className="h-4 w-4" />

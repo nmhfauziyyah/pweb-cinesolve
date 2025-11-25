@@ -100,14 +100,15 @@ const getTrending = async (req, res) => {
   }
 };
 
+
 const createFilm = async (req, res) => {
   try {
-    const { title, description, genre, country, releaseYear, posterUrl, moodTags } = req.body;
+    const { title, description, genre, country, releaseYear, posterUrl, moodTags, watchSources } = req.body;
     
     let posterData = {};
     if (req.file) {
       posterData.posterType = 'upload';
-      posterData.posterUpload = `/uploads/posters/${req.file.filename}`;
+      posterData.posterUpload = req.file.filename;
     } else if (posterUrl) {
       posterData.posterType = 'url';
       posterData.posterUrl = posterUrl;
@@ -128,6 +129,17 @@ const createFilm = async (req, res) => {
       }
     }
 
+    // Handle watchSources
+    let watchSourcesArray = [];
+    if (watchSources) {
+      try {
+        watchSourcesArray = typeof watchSources === 'string' ? JSON.parse(watchSources) : watchSources;
+        if (!Array.isArray(watchSourcesArray)) watchSourcesArray = [];
+      } catch (e) {
+        watchSourcesArray = [];
+      }
+    }
+
     const film = await Film.create({
       title,
       description,
@@ -135,6 +147,7 @@ const createFilm = async (req, res) => {
       country,
       releaseYear: parseInt(releaseYear),
       moodTags: Array.isArray(moodTags) ? moodTags : [],
+      watchSources: watchSourcesArray,
       ...posterData,
       created_by: req.user.id
     });
@@ -157,7 +170,7 @@ const createFilm = async (req, res) => {
 
 const updateFilm = async (req, res) => {
   try {
-    const { title, description, genre, country, releaseYear, posterUrl: posterUrlFromBody, moodTags } = req.body;
+    const { title, description, genre, country, releaseYear, posterUrl: posterUrlFromBody, moodTags, watchSources } = req.body;
     
     let updateData = {
       title,
@@ -184,9 +197,21 @@ const updateFilm = async (req, res) => {
     
     updateData.genre = genreArray.length > 0 ? genreArray : [];
 
+    // Handle watchSources
+    if (watchSources) {
+      try {
+        updateData.watchSources = typeof watchSources === 'string' ? JSON.parse(watchSources) : watchSources;
+        if (!Array.isArray(updateData.watchSources)) updateData.watchSources = [];
+      } catch (e) {
+        updateData.watchSources = [];
+      }
+    }
+
     if (req.file) {
+      // *** PERUBAHAN KRUSIAL: HANYA SIMPAN NAMA FILE ***
+      // Sebelumnya: updateData.posterUpload = `/uploads/posters/${req.file.filename}`;
       updateData.posterType = 'upload';
-      updateData.posterUpload = `/uploads/posters/${req.file.filename}`;
+      updateData.posterUpload = req.file.filename;
     } else if (posterUrlFromBody) {
       updateData.posterType = 'url';
       updateData.posterUrl = posterUrlFromBody;
@@ -223,17 +248,35 @@ const deleteFilm = async (req, res) => {
   try {
     const film = await Film.findById(req.params.id);
     if (!film) return res.status(404).json({ message: 'Film not found' });
+    
     // remove poster file if exists and is local
-    if (film.poster && film.poster.startsWith('/uploads')) {
-      const path = `.${film.poster}`;
-      if (fs.existsSync(path)) fs.unlinkSync(path);
+    if (film.posterUpload && film.posterUpload.startsWith('/uploads')) {
+      const path = `.${film.posterUpload}`;
+      if (fs.existsSync(path)) {
+        fs.unlinkSync(path);
+      }
     }
-    await film.remove();
-    res.json({ message: 'Deleted' });
+    
+    // Use findByIdAndDelete instead of deprecated remove()
+    await Film.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Deleted successfully' });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Server error' });
+    console.error('Error deleting film:', err);
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
+};
+
+const uploadPoster = (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ error: 'No file uploaded.' });
+    }
+    
+    // PENTING: Mengembalikan HANYA NAMA FILE SAJA
+    // Contoh: "image_a09d02.jpg"
+    res.json({ 
+        message: 'Poster uploaded successfully.',
+        fileName: req.file.filename 
+    });
 };
 
 // Bookmark handlers
@@ -302,6 +345,7 @@ module.exports = {
   createFilm,
   updateFilm,
   deleteFilm,
+  uploadPoster,
   addBookmark,
   removeBookmark,
   getBookmarks

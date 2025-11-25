@@ -21,6 +21,22 @@ interface Country {
   flag?: string;
 }
 
+interface WatchSource {
+  platformName: string;
+  platformIcon: string;
+  platformUrl: string;
+}
+
+const WATCH_PLATFORMS = [
+  { name: 'Netflix', icon: '/netflix.png', url: 'https://www.netflix.com/browse' },
+  { name: 'Disney+', icon: '/disney.jpeg', url: 'https://disneyplus.com/' },
+  { name: 'Prime Video', icon: '/prime.png', url: 'https://www.primevideo.com/' },
+  { name: 'Viu', icon: '/viu.png', url: 'https://www.viu.com/' },
+  { name: 'iQiyi', icon: '/iqiyi.png', url: 'https://www.iq.com/' },
+  { name: 'Vidio', icon: '/vidio.png', url: 'https://www.vidio.com/' },
+  { name: 'WeTV', icon: '/wetv.jpg', url: 'https://wetv.vip/id' },
+];
+
 const EditMovie = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -31,6 +47,7 @@ const EditMovie = () => {
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [posterSource, setPosterSource] = useState<'upload' | 'url'>('upload');
+  const [watchSources, setWatchSources] = useState<WatchSource[]>([]);
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -82,6 +99,11 @@ const EditMovie = () => {
         releaseYear: movie.year?.toString() || '',
       });
       
+      // Set watch sources
+      if (movie.watchSources && Array.isArray(movie.watchSources)) {
+        setWatchSources(movie.watchSources);
+      }
+      
       // Find genre IDs by name - wait for genres to be loaded
       setTimeout(() => {
         const genreIds = movie.genres?.map((genreName: string) => {
@@ -97,6 +119,29 @@ const EditMovie = () => {
       console.error('Error fetching movie:', error);
       toast({ title: 'Failed to fetch movie', variant: 'destructive' });
       setIsLoading(false);
+    }
+  };
+
+  // Contoh di AddMovie.tsx/EditMovie.tsx
+  const handleFileUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append('poster', file);
+
+    try {
+        // Asumsi API endpoint upload: POST /api/movies/upload-poster
+        const response = await axiosInstance.post('/movies/upload-poster', formData);
+
+        // PENTING: Backend HARUS merespons dengan nama file baru (e.g., { fileName: "1678...jpg" })
+        const newFileName = response.data.fileName; 
+
+        // Set state form/movie data dengan nama file BARU ini
+        setFormData(prev => ({ ...prev, poster: newFileName, uploadMode: 'Upload Image' }));
+
+        // Di sini kamu juga bisa set URL untuk preview temporer
+        setPreviewUrl(URL.createObjectURL(file)); 
+
+    } catch (error) {
+        console.error('Upload failed:', error);
     }
   };
 
@@ -116,6 +161,30 @@ const EditMovie = () => {
     setSelectedGenres(prev =>
       prev.includes(genreId) ? prev.filter(g => g !== genreId) : [...prev, genreId]
     );
+  };
+
+  const handleAddWatchSource = (platformName: string) => {
+    if (!watchSources.find(w => w.platformName === platformName)) {
+      const platform = WATCH_PLATFORMS.find(p => p.name === platformName);
+      setWatchSources([
+        ...watchSources,
+        {
+          platformName,
+          platformIcon: platform?.icon || '/netflix.png',
+          platformUrl: platform?.url || '',
+        },
+      ]);
+    }
+  };
+
+  const handleWatchSourceUrlChange = (platformName: string, url: string) => {
+    setWatchSources(watchSources.map(w => 
+      w.platformName === platformName ? { ...w, platformUrl: url } : w
+    ));
+  };
+
+  const handleRemoveWatchSource = (platformName: string) => {
+    setWatchSources(watchSources.filter(w => w.platformName !== platformName));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,6 +221,11 @@ const EditMovie = () => {
       data.append('releaseYear', formData.releaseYear);
       data.append('moodTags', JSON.stringify([]));
       
+      // Append watch sources
+      if (watchSources.length > 0) {
+        data.append('watchSources', JSON.stringify(watchSources));
+      }
+      
       if (posterSource === 'upload' && formData.poster) {
         data.append('poster', formData.poster);
       } else if (posterSource === 'url' && formData.posterUrl) {
@@ -182,7 +256,7 @@ const EditMovie = () => {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-50 glass-card border-b">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 md:px-6 py-4">
           <Button
             variant="ghost"
             size="icon"
@@ -194,11 +268,11 @@ const EditMovie = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-4 md:px-6 py-12">
         <div className="max-w-3xl mx-auto space-y-8">
-          <h1 className="font-display text-4xl font-bold">Edit Movie</h1>
+          <h1 className="font-display text-3xl md:text-4xl font-bold">Edit Movie</h1>
 
-          <form onSubmit={handleSubmit} className="glass-card p-8 rounded-3xl space-y-6">
+          <form onSubmit={handleSubmit} className="glass-card p-6 md:p-8 rounded-3xl space-y-6">
             <div className="space-y-2">
               <Label htmlFor="title">Title</Label>
               <Input
@@ -350,6 +424,58 @@ const EditMovie = () => {
                 required
                 className="rounded-xl"
               />
+            </div>
+
+            <div className="space-y-3">
+              <Label>Where to Watch (Optional)</Label>
+              <div className="space-y-3">
+                {/* Available platforms */}
+                <div className="space-y-2">
+                  <p className="text-sm text-muted-foreground">Add platforms (URLs auto-filled):</p>
+                  <div className="flex flex-wrap gap-2">
+                    {WATCH_PLATFORMS.map((platform) => (
+                      <Button
+                        key={platform.name}
+                        type="button"
+                        variant={watchSources.some(w => w.platformName === platform.name) ? 'default' : 'outline'}
+                        size="sm"
+                        onClick={() => handleAddWatchSource(platform.name)}
+                        className="rounded-lg"
+                      >
+                        <img src={platform.icon} alt={platform.name} className="h-4 w-4 mr-1" />
+                        {platform.name}
+                      </Button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Selected platforms */}
+                {watchSources.length > 0 && (
+                  <div className="space-y-2 p-3 border border-input rounded-xl bg-muted/30">
+                    <p className="text-sm font-medium">Selected platforms:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {watchSources.map((source) => (
+                        <div
+                          key={source.platformName}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg bg-primary/20 border border-primary/50"
+                        >
+                          <img src={source.platformIcon} alt={source.platformName} className="h-4 w-4" />
+                          <span className="text-sm font-medium">{source.platformName}</span>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleRemoveWatchSource(source.platformName)}
+                            className="h-5 w-5 p-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
 
             <Button

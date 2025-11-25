@@ -46,7 +46,7 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen flex items-center justify-center p-4 md:p-6 relative overflow-hidden">
       <div className="absolute inset-0 premium-gradient opacity-20"></div>
       
       <div className="absolute top-6 right-6 z-10">
@@ -54,15 +54,15 @@ const Login = () => {
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        <div className="glass-card p-8 rounded-3xl space-y-8">
+        <div className="glass-card p-6 md:p-8 rounded-3xl space-y-8">
           <div className="text-center space-y-2">
             <div className="flex justify-center mb-4">
               <div className="p-3 rounded-2xl bg-primary/10">
                 <Film className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h1 className="font-display text-3xl font-bold">Welcome Back</h1>
-            <p className="text-muted-foreground">Sign in to continue your journey</p>
+            <h1 className="font-display text-2xl md:text-3xl font-bold">Welcome Back</h1>
+            <p className="text-sm md:text-base text-muted-foreground">Sign in to continue your journey</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
@@ -94,7 +94,7 @@ const Login = () => {
 
             <Button
               type="submit"
-              className="w-full rounded-xl text-lg font-semibold"
+              className="w-full rounded-xl font-semibold"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -108,7 +108,7 @@ const Login = () => {
             </Button>
           </form>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-xs md:text-sm text-muted-foreground">
             Don't have an account?{' '}
             <Link to="/register" className="text-primary hover:underline font-semibold">
               Sign up

@@ -43,6 +43,13 @@ const UserHome = () => {
   const [filteredMovies, setFilteredMovies] = useState([]);
   const [carouselPosition, setCarouselPosition] = useState(0);
 
+  // Check if user is authenticated, redirect to login if not
+  useEffect(() => {
+    if (!user) {
+      navigate('/login');
+    }
+  }, [user, navigate]);
+
   // Mood to genres mapping
   const moods: Mood[] = [
     { 
@@ -171,14 +178,19 @@ const UserHome = () => {
     setSelectedMood(null);
   };
 
+  // Show loading or redirect if not authenticated
+  if (!user) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen">
       {/* Header */}
       <header className="sticky top-0 z-50 glass-card border-b">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-4 md:px-6 py-4 flex items-center justify-between">
           <button onClick={handleLogoClick} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
             <Film className="h-7 w-7 text-primary" />
-            <span className="font-display text-2xl font-bold">CineSolve</span>
+            <span className="font-display text-2xl font-bold hidden sm:inline">CineSolve</span>
           </button>
           
           <div className="flex items-center gap-4">
@@ -211,13 +223,13 @@ const UserHome = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8 space-y-12">
+      <main className="container mx-auto px-4 md:px-6 py-8 space-y-12">
         {/* Welcome Section */}
         <div className="space-y-4">
-          <h1 className="font-display text-4xl font-bold">
+          <h1 className="font-display text-3xl md:text-4xl font-bold">
             Welcome back, {user?.name}!
           </h1>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-lg md:text-xl text-muted-foreground">
             What's your mood today?
           </p>
         </div>
@@ -231,14 +243,14 @@ const UserHome = () => {
               <button
                 key={mood.id}
                 onClick={() => setSelectedMood(isSelected ? null : mood.id)}
-                className={`p-6 rounded-2xl hover-lift transition-all ${
+                className={`p-4 md:p-6 rounded-2xl hover-lift transition-all ${
                   isSelected
                     ? 'bg-primary text-primary-foreground shadow-lg scale-105'
                     : 'glass-card text-left group'
                 }`}
               >
-                <Icon className={`h-8 w-8 mb-3 ${!isSelected ? mood.color : ''} transition-smooth group-hover:scale-110`} />
-                <p className="font-semibold">{mood.label}</p>
+                <Icon className={`h-6 md:h-8 w-6 md:w-8 mb-2 md:mb-3 ${!isSelected ? mood.color : ''} transition-smooth group-hover:scale-110`} />
+                <p className="font-semibold text-sm md:text-base">{mood.label}</p>
               </button>
             );
           })}
@@ -256,7 +268,7 @@ const UserHome = () => {
         )}
 
         {/* Search & Filters */}
-        <div className="glass-card p-6 rounded-2xl space-y-4">
+        <div className="glass-card p-4 md:p-6 rounded-2xl space-y-4">
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
             <Input
@@ -268,7 +280,7 @@ const UserHome = () => {
             />
           </div>
           
-          <div className="flex gap-4">
+          <div className="flex flex-col md:flex-row gap-4">
             <Select value={selectedCountry} onValueChange={setSelectedCountry}>
               <SelectTrigger className="rounded-xl">
                 <SelectValue placeholder="Country" />
@@ -313,11 +325,11 @@ const UserHome = () => {
             <div className="overflow-hidden">
               <div 
                 className="flex transition-all duration-500 ease-out"
-                style={{ transform: `translateX(calc(-${carouselPosition * 20}% - ${carouselPosition * 12}px))` }}
+                style={{ transform: `translateX(calc(-${carouselPosition * (100/2)}% - ${carouselPosition * 12}px))` }}
               >
                 {trendingMovies.length > 0 ? (
                   trendingMovies.map((movie: any, index: number) => (
-                    <div key={movie._id} className="flex-shrink-0 w-1/5 px-3">
+                    <div key={movie._id} className="flex-shrink-0 w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-3">
                       <div className="relative">
                         <MovieCard movie={movie} />
                         {/* Ranking Number */}
@@ -367,7 +379,7 @@ const UserHome = () => {
                 : 'Browse All'}
           </h2>
           
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
             {filteredMovies.length > 0 ? (
               filteredMovies.map((movie: any) => (
                 <MovieCard key={movie._id} movie={movie} />

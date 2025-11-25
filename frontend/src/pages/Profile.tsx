@@ -10,7 +10,7 @@ const Profile = () => {
   return (
     <div className="min-h-screen">
       <header className="sticky top-0 z-50 glass-card border-b">
-        <div className="container mx-auto px-6 py-4">
+        <div className="container mx-auto px-4 md:px-6 py-4">
           <Button
             variant="ghost"
             size="icon"
@@ -22,11 +22,11 @@ const Profile = () => {
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-12">
+      <main className="container mx-auto px-4 md:px-6 py-12">
         <div className="max-w-2xl mx-auto space-y-8">
-          <h1 className="font-display text-4xl font-bold">Profile</h1>
+          <h1 className="font-display text-3xl md:text-4xl font-bold">Profile</h1>
 
-          <div className="glass-card p-8 rounded-3xl space-y-6">
+          <div className="glass-card p-6 md:p-8 rounded-3xl space-y-6">
             <div className="flex justify-center">
               <div className="w-24 h-24 rounded-full bg-primary/10 flex items-center justify-center">
                 <User className="h-12 w-12 text-primary" />
